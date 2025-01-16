@@ -9,7 +9,7 @@
             <el-input v-model="loginForm.mobile" placeholder="请输入手机号" />
           </el-form-item>
           <el-form-item prop="password">
-            <el-input v-model="loginForm.password" placeholder="请输入密码" />
+            <el-input v-model="loginForm.password" show-password placeholder="请输入密码" />
           </el-form-item>
           <el-form-item prop="isAgree">
             <el-checkbox v-model="loginForm.isAgree">
@@ -71,7 +71,7 @@ export default {
     login() {
       this.$refs.form.validate((isOK) => {
         if (isOK) {
-          alert('校验通过')
+          this.$store.dispatch('user/login', this.loginForm)
         }
       })
     }
