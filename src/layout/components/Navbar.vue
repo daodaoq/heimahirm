@@ -7,8 +7,13 @@
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
-          <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
-          <i class="el-icon-caret-bottom" />
+          <!-- 头像 -->
+          <img v-if="avatar" :src="avatar" class="user-avatar">
+          <span v-else class="username">{{ name?.charAt(0) }}</span>
+          <!-- 用户名称 -->
+          <span class="name">{{ name }}</span>
+          <!-- 图标 -->
+          <i class="el-icon-setting" />
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
           <router-link to="/">
@@ -44,7 +49,8 @@ export default {
   computed: {
     ...mapGetters([
       'sidebar',
-      'avatar'
+      'avatar',
+      'name'
     ])
   },
   methods: {
@@ -111,27 +117,34 @@ export default {
       }
     }
 
-    .avatar-container {
-      margin-right: 30px;
-
-      .avatar-wrapper {
-        margin-top: 5px;
-        position: relative;
-
-        .user-avatar {
-          cursor: pointer;
-          width: 40px;
-          height: 40px;
-          border-radius: 10px;
-        }
-
-        .el-icon-caret-bottom {
-          cursor: pointer;
-          position: absolute;
-          right: -20px;
-          top: 25px;
-          font-size: 12px;
-        }
+    .avatar-wrapper {
+      margin-top: 5px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      .name {
+        //  用户名称距离右侧距离
+        margin-right: 10px;
+        font-size: 16px;
+      }
+      .username {
+        width: 30px;
+        height: 30px;
+        text-align: center;
+        line-height: 30px;
+        border-radius: 50%;
+        background: #04c9be;
+        color: #fff;
+        margin-right: 4px;
+      }
+      .el-icon-setting {
+        font-size: 20px;
+      }
+      .user-avatar {
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
       }
     }
   }
