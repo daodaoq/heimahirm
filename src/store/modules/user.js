@@ -49,13 +49,8 @@ const actions = {
   },
   // 退出登录
   async logout(context) {
-    try {
-      context.commit('removeToken') // 清空 token
-      context.commit('clearUserInfo') // 清空用户信息
-    } catch (error) {
-      console.error('退出登录失败:', error)
-      throw error
-    }
+    context.commit('removeToken') // 删除token
+    context.commit('setUserInfo', {}) // 设置用户信息为空对象
   }
 }
 
