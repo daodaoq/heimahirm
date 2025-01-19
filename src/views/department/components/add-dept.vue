@@ -25,8 +25,8 @@
         <!-- 按钮 -->
         <el-row type="flex" justify="center">
           <el-col :span="12">
-            <el-button size="mini" type="primary">确定</el-button>
-            <el-button size="mini">取消</el-button>
+            <el-button size="mini" type="primary" @click="btnOK">确定</el-button>
+            <el-button size="mini" @click="close">取消</el-button>
           </el-col>
         </el-row>
       </el-form-item>
@@ -34,7 +34,7 @@
   </el-dialog>
 </template>
 <script>
-import { getDepartment, getManagerList } from '@/api/department'
+import { addDepartment, getDepartment, getDepartmentDetail, getManagerList } from '@/api/department'
 
 export default {
   name: 'AddDept',
@@ -42,6 +42,10 @@ export default {
     showDialog: {
       type: Boolean,
       default: false
+    },
+    currentNodeId: {
+      type: Number,
+      default: null
     }
   },
   data() {
@@ -64,7 +68,12 @@ export default {
             // 自定义校验模式
             validator: async(rule, value, callback) => {
               // value就是输入的编码
-              const result = await getDepartment()
+              let result = await getDepartment()
+              // 判断是否是编辑模式
+              if (this.formData.id) {
+                // 编辑场景
+                result = result.filter(item => item.id !== this.formData.id)
+              }
               // result数组中是否存在 value值
               if (result.some(item => item.code === value)) {
                 callback(new Error('部门中已经有该编码了'))
@@ -87,7 +96,11 @@ export default {
             // 自定义校验模式
             validator: async(rule, value, callback) => {
               // value就是输入的编码
-              const result = await getDepartment()
+              let result = await getDepartment()
+              if (this.formData.id) {
+                // 编辑场景 排除自身
+                result = result.filter(item => item.id !== this.formData.id)
+              }
               // result数组中是否存在 value值
               if (result.some(item => item.name === value)) {
                 callback(new Error('部门中已经有该名称了'))
@@ -105,11 +118,28 @@ export default {
     this.getManagerList()
   },
   methods: {
-    close() {
-      this.$emit('update:showDialog', false)
-    },
     async getManagerList() {
       this.managerList = await getManagerList()
+    },
+    // 点击确定时调用
+    btnOK() {
+      this.$refs.addDept.validate(async isOK => {
+        if (isOK) {
+          await addDepartment({ ...this.formData, pid: this.currentNodeId })
+          // 通知父组件更新
+          this.$emit('updateDepartment')
+          // 提示消息
+          this.$message.success(`新增部门成功`)
+          this.close()
+        }
+      })
+    },
+    close() {
+      this.$refs.addDept.resetFields() // 重置表单
+      this.$emit('update:showDialog', false)
+    },
+    async getDepartmentDetail() {
+      this.formData = await getDepartmentDetail(this.currentNodeId)
     }
   }
 }

@@ -10,7 +10,7 @@
             <el-col :span="4">
               <span class="tree-manager">{{ data.managerName }}</span>
               <!-- $event 实参 表示类型 -->
-              <el-dropdown @command="operateDept">
+              <el-dropdown @command="operateDept($event, data.id)">
                 <!-- 显示区域内容 -->
                 <span class="el-dropdown-link">
                   操作<i class="el-icon-arrow-down el-icon--right" />
@@ -27,7 +27,7 @@
         </template>
       </el-tree>
     </div>
-    <add-dept :show-dialog.sync="showDialog" />
+    <add-dept ref="addDept" :current-node-id="currentNodeId" :show-dialog.sync="showDialog" @updateDepartment="getDepartment" />
   </div>
 </template>
 <script>
@@ -40,6 +40,7 @@ export default {
   data() {
     return {
       showDialog: false,
+      currentNodeId: null, // 存储当前点击的id
       depts: [],
       defaultProps: {
         children: 'children',
@@ -55,9 +56,22 @@ export default {
       const result = await getDepartment()
       this.depts = transListToTreeData(result, 0)
     },
-    operateDept(type) {
+    // 操作部门方法
+    operateDept(type, id) {
       if (type === 'add') {
-        this.showDialog = true
+        // 添加子部门
+        this.showDialog = true // 显示弹层
+        this.currentNodeId = id
+      } else if (type === 'edit') {
+        this.showDialog = true // 显示弹层
+        this.currentNodeId = id
+        // 更新props- 异步动作
+        // 直接调用了子组件的方法 同步的方法
+        // 要在子组件获取数据
+        // 父组件调用子组件的方法来获取数据
+        this.$nextTick(() => {
+          this.$refs.addDept.getDepartmentDetail() // this.$refs.addDept等同于子组件的this
+        })
       }
     }
   }
